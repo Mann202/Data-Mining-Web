@@ -4,20 +4,19 @@ import sklearn
 import numpy as np
 import pickle
 
-# Định nghĩa trạng thái hiện tại của ứng dụng, giả sử 'main' là trang chính và 'risk_page' là trang hiện tại
-current_page = st.session_state.get('page', 'risk_page')
+current_page = st.session_state.get('page', 'main')
 
 # Load models =========================
-with open('./models/knn_op.pkl', 'rb') as knn_model_file:
-    knn_model = pickle.load(knn_model_file)
+#with open('./models/knn_op.pkl', 'rb') as knn_model_file:
+    #knn_model = pickle.load(knn_model_file)
 with open('./models/gnb_op.pkl', 'rb') as gnb_model_file:
     gnb_model = pickle.load(gnb_model_file)
 with open('./models/bnb_op.pkl', 'rb') as bnb_model_file:
     bnb_model = pickle.load(bnb_model_file)
-with open('./models/dt_op.pkl', 'rb') as dt_model_file:
-    dt_model = pickle.load(dt_model_file)
-with open('./models/knn_op.pkl', 'rb') as rf_model_file:
-    rf_model = pickle.load(rf_model_file)
+#with open('./models/dt_op.pkl', 'rb') as dt_model_file:
+    #dt_model = pickle.load(dt_model_file)
+#with open('./models/knn_op.pkl', 'rb') as rf_model_file:
+    #rf_model = pickle.load(rf_model_file)
 # =========================================
 
 def predict_high_risk_death(model, features):
@@ -35,9 +34,7 @@ if current_page == 'main':
     st.write("This project is inspired by the COVID-19 pandemic, a historical event that changed the world three years ago. Although the pandemic has ended, its impacts continue to affect people's mentality and lives. This project aims to commemorate COVID-19 as the largest medical event of the century and convey a message about the importance of unity and human resilience in the face of immense challenges.")
 
     with st.form(key='my_form'):
-        # Các widget nhập liệu trong form
         age = st.text_input("How old are you?")
-
         if age:
             try:
                 age = int(age)
@@ -57,7 +54,6 @@ if current_page == 'main':
         selectionBox3 = st.selectbox("Did you have covid test before? If you did, select the diagnosis of the test", (1,2,3,4,5,6,7))
 
         st.markdown("<hr>", unsafe_allow_html=True)
-        model = st.selectbox( 'Pick a model?', ('Gaussian Naives Bayes', 'Bernoulli Naives Bayes','Decicion Tree', 'Random Forest', 'K-Nearest Neighboor')) 
         
         submit_button = st.form_submit_button(label='Submit')
 
@@ -83,7 +79,6 @@ if current_page == 'main':
             medi_unit12 = 0
             medi_unit13 = 0
 
-            # Validate user input
             if 1 <= selectionBox1 <= 13:
                 for i in range(2, 14):
                     if i == selectionBox1:
@@ -92,7 +87,6 @@ if current_page == 'main':
                     else:
                         continue
 
-            # CLASSI_FIANL :v
             classi_final2 = 0
             classi_final3 = 0
             classi_final4 = 0
@@ -100,7 +94,6 @@ if current_page == 'main':
             classi_final6 = 0
             classi_final7 = 0
 
-            # Validate user input
             if 1 <= selectionBox3 <= 7:
                 for i in range(2, 8):
                     if i == selectionBox3:
@@ -113,25 +106,25 @@ if current_page == 'main':
             features_other = np.array([ 
             [selectionBox2, yes_no_hospitalized, yes_no_pneumonia, age, yes_no_diabetes, yes_no_hypertension, yes_no_renalChronal, medi_unit2, medi_unit3, medi_unit4, medi_unit5, medi_unit6, medi_unit7, medi_unit8, medi_unit9, medi_unit10, medi_unit11, medi_unit12, medi_unit13, classi_final2, classi_final3, classi_final4, classi_final5, classi_final6, classi_final7]], dtype= object)
             
-            model = st.selectbox( 'Pick a model?', ('Gaussian Naives Bayes', 'Bernoulli Naives Bayes','Decicion Tree', 'Random Forest', 'K-Nearest Neighboor')) 
-            btn = st.button("Predict")
+            model = st.selectbox( 'Pick a model?', ('Gaussian Naives Bayes', 'Bernoulli Naives Bayes','Decicion Tree', 'Random Forest', 'K-Nearest Neighboor'), key="select_model") 
+            btn = st.form_submit_button("Predict")
             if btn:
                 if model == 'Gaussian Naives Bayes':
                     prediction = predict_high_risk_death(gnb_model, features_other)
                 elif model == 'Bernoulli Naives Bayes':
                     prediction = predict_high_risk_death(bnb_model, features_other)
-                elif model == 'Decicion Tree':
-                    prediction = predict_high_risk_death(dt_model, features_other)
-                elif model == 'Random Forest':
-                    prediction = predict_high_risk_death(rf_model, features_other)
-                elif model == 'K-Nearest Neighboor':
-                    prediction = predict_high_risk_death(knn_model, features_other)
+                #elif model == 'Decicion Tree':
+                    #prediction = predict_high_risk_death(dt_model, features_other)
+                #elif model == 'Random Forest':
+                    #prediction = predict_high_risk_death(rf_model, features_other)
+                #elif model == 'K-Nearest Neighboor':
+                    #prediction = predict_high_risk_death(knn_model, features_other)
 
-            if prediction is not None: 
-                if prediction[0] == 1:  
-                    st.session_state['page'] = 'high-risk'
-                else:
-                    st.session_state['page'] = 'low-risk'
+                if prediction is not None: 
+                    if prediction[0] == 1:  
+                        st.session_state['page'] = 'high-risk'
+                    else:
+                        st.session_state['page'] = 'low-risk'
 else:
     # Title của ứng dụng Streamlit
     st.title("Machine Learning-Based Classification for Predicting COVID-19 Mortality Rates")
